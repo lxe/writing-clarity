@@ -66,6 +66,13 @@ class HookTests(unittest.TestCase):
         self.run_cli('enable', '--agent', 'claude-code')
         self.assertIn('Silently check', self.invoke('claude-code', 'UserPromptSubmit')['additionalContext'])
 
+    def test_codex_hooks_have_distinct_readable_labels(self):
+        self.run_cli('install')
+        hooks = json.loads(self.config('codex').read_text())['hooks']
+        labels = [hooks[event][-1]['hooks'][0]['statusMessage'] for event in ('SessionStart', 'SubagentStart', 'UserPromptSubmit')]
+        self.assertEqual(len(set(labels)), 3)
+        self.assertTrue(all(label.startswith('Writing clarity:') for label in labels))
+
     def test_full_every_turn(self):
         self.run_cli('install', '--full-every-turn')
         for agent in ('codex', 'claude-code'):

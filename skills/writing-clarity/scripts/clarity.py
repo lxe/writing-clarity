@@ -13,6 +13,11 @@ import time
 SKILL = Path(__file__).resolve().parents[1] / 'SKILL.md'
 MARKER = '--writing-clarity-hook'
 EVENTS = ('SessionStart', 'SubagentStart', 'UserPromptSubmit')
+LABELS = {
+    'SessionStart': 'Writing clarity: load full guide',
+    'SubagentStart': 'Writing clarity: guide subagents',
+    'UserPromptSubmit': 'Writing clarity: reinforce each prompt',
+}
 REMINDER = (
     'The user prefers the writing-clarity guide supplied at session start. '
     'For prose, keep subjects and references identifiable; explain necessary logical '
@@ -117,6 +122,7 @@ def install_config(config, home, agent):
         handler = {'type': 'command', 'command': command, 'timeout': 5}
         if agent == 'codex':
             handler['additionalContextLimit'] = 5000
+            handler['statusMessage'] = LABELS[event]
         hooks.setdefault(event, []).append({'hooks': [handler]})
     return result
 
